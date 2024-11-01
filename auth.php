@@ -1,7 +1,7 @@
 <?php
 /**
  * auth.php - Simple Authentication System
- * Version: 2.0
+ * Version: 2.1
  * Release Date: 11/2024
  * Author: PB
  * Email: pavel.bartos.pb@gmail.com
@@ -23,7 +23,7 @@
  */
 
 // Proměnná pro verzi na začátku souboru
-$auth_version = '2.0';
+$auth_version = '2.1';
 
 // Inicializace nastavení
 $auth_settings = [];
