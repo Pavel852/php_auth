@@ -1,0 +1,26 @@
+{
+    "name": "pavel852/php-auth",
+    "description": "Simple authentification system for PHP.",
+    "type": "library",
+    "license": "MIT",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "files": ["auth.php"]
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+        {
+            "name": "Pavel Bartos",
+            "email": "pavel.bartos.pb@gmail.com",
+            "orcid": "https://orcid.org/0009-0001-3558-4312"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/Pavel852/php_auth",
+        "issues": "https://github.com/Pavel852/php_auth/issues",
+        "license": "https://github.com/Pavel852/php_auth/blob/main/LICENSE",
+        "docs": "https://github.com/Pavel852/php_auth/blob/main/readme_en.md"
+    }
+}
