@@ -1,7 +1,7 @@
 <?php
 /**
  * auth.php - Simple Authentication System
- * Version: 2.1
+ * Version: 2.2
  * Release Date: 11/2024
  * Author: PB
  * Email: pavel.bartos.pb@gmail.com
@@ -11,19 +11,20 @@
  * - auth_version(): Vrací aktuální verzi systému autentizace.
  * - generateNumericPassword($length): Generuje náhodné číselné heslo.
  * - generateToken(): Generuje náhodný token.
- * - auth_register($username, $password, $userid, $email): Registrace nového uživatele.
- * - auth_login($identifier, $password, $user_data): Přihlášení uživatele.
+ * - auth_register($username, $password, $userid, $email, $displayname): Registrace nového uživatele.
+ * - auth_login($identifier, $password): Přihlášení uživatele.
  * - auth_logout(): Odhlášení uživatele.
- * - auth_request_password_reset($email, $user_data): Žádost o resetování hesla.
- * - auth_reset_password($token, $new_password, &$user_data): Resetování hesla pomocí tokenu.
- * - auth_verify_email($token, &$user_data): Verifikace emailu pomocí tokenu.
+ * - auth_request_password_reset($email): Žádost o resetování hesla.
+ * - auth_reset_password($token, $new_password): Resetování hesla pomocí tokenu.
+ * - auth_verify_email($token): Verifikace emailu pomocí tokenu.
  * - auth_get_user(): Získání aktuálně přihlášeného uživatele.
  * - auth_is_logged_in(): Kontrola, zda je uživatel přihlášen.
+ * - auth_displayname(): Získání zobrazovaného jména aktuálně přihlášeného uživatele.
  * - auth_debug(): Výpis informací o registrovaných uživatelích pro debugování.
  */
 
-// Proměnná pro verzi na začátku souboru
-$auth_version = '2.1';
+// Definice verze jako konstanty
+define('AUTH_VERSION', '2.2');
 
 // Inicializace nastavení
 $auth_settings = [];
@@ -104,13 +105,12 @@ auth_settings();
 /**
  * Funkce auth_version
  *
- * Vrací pouze verzi systému autentizace jako řetězec.
+ * Vrací aktuální verzi systému autentizace jako řetězec.
  *
  * @return string
  */
 function auth_version() {
-    global $auth_version;
-    return $auth_version;
+    return AUTH_VERSION;
 }
 
 // Pomocné funkce
@@ -145,9 +145,10 @@ function generateToken() {
  * @param string|null $password Heslo (nepovinné, pokud je emailová verifikace povolena).
  * @param mixed $userid ID uživatele (nepovinné).
  * @param string|null $email Email uživatele (nepovinné).
+ * @param string|null $displayname Zobrazované jméno (nepovinné).
  * @return array|string Vrací pole s uživatelskými údaji nebo chybovou zprávu.
  */
-function auth_register($username, $password = null, $userid = null, $email = null) {
+function auth_register($username, $password = null, $userid = null, $email = null, $displayname = null) {
     global $auth_settings, $registered_users;
 
     // Zpracování vstupů
@@ -159,6 +160,7 @@ function auth_register($username, $password = null, $userid = null, $email = nul
             'password' => $password,
             'userid' => $userid,
             'email' => $email,
+            'displayname' => $displayname,
         ];
     }
 
@@ -196,6 +198,7 @@ function auth_register($username, $password = null, $userid = null, $email = nul
         'password' => $hashed_password,
         'userid' => $data['userid'] ?? null,
         'email' => $data['email'] ?? null,
+        'displayname' => $data['displayname'] ?? $data['username'],
         'is_verified' => $is_verified,
         'verification_token' => $verification_token,
         'verification_expires' => $verification_expires,
@@ -253,6 +256,7 @@ function auth_login($identifier, $password) {
     // Nastavení session
     $_SESSION['user_id'] = $user_data['userid'] ?? $user_data['username'];
     $_SESSION['username'] = $user_data['username'];
+    $_SESSION['displayname'] = $user_data['displayname'] ?? $user_data['username'];
 
     return true;
 }
@@ -425,6 +429,15 @@ function auth_is_logged_in() {
 }
 
 /**
+ * Funkce pro získání zobrazovaného jména aktuálně přihlášeného uživatele.
+ *
+ * @return string|null
+ */
+function auth_displayname() {
+    return $_SESSION['displayname'] ?? null;
+}
+
+/**
  * Funkce pro debugování - výpis registrovaných uživatelů.
  *
  * @return void
@@ -432,20 +445,20 @@ function auth_is_logged_in() {
 function auth_debug() {
     global $registered_users;
 
-    echo '<hr>';
-    echo '<div>';
-    echo '<a href="#" onclick="var el=document.getElementById(\'auth_debug_info\'); if(el.style.display==\'none\'){el.style.display=\'block\';}else{el.style.display=\'none\';} return false;">->auth debug</a>';
-    echo '<div id="auth_debug_info" style="display:none;">';
+    echo "<hr>";
+    echo "<div>";
+    echo "<a href=\"#\" onclick=\"var el=document.getElementById('auth_debug_info'); if(el.style.display==='none'){el.style.display='block';}else{el.style.display='none';} return false;\">->auth debug</a>";
+    echo "<div id=\"auth_debug_info\" style=\"display:none;\">";
 
     foreach ($registered_users as $user) {
         $user_info = $user;
-        $user_info['password'] = '***';
-        echo '<pre>';
+        $user_info['password'] = '***'; // Nahrazení hesla hvězdičkami
+        echo "<pre>";
         print_r($user_info);
-        echo '</pre>';
+        echo "</pre>";
     }
 
-    echo '</div>';
-    echo '</div>';
+    echo "</div>";
+    echo "</div>";
 }
 
